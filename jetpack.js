@@ -80,27 +80,22 @@ var jetpack = {
         if (!self.hasListener){
 
             var listener = function (e) {
-                var target = e.target;
-                if (target.nodeName === 'A') {
-                    if (target.getAttribute('href') === '#') {
-                        e.preventDefault();
-                        self.scrollToElement(document.body, {
-                            callback: function () {
-                                window.location.href = '#'
-                            }
-                        });
-                    } else {
-                        var href, elem;
-                        if (href = /[^#]+$/.exec(target.href)) {
-                            e.preventDefault();
-                            if (elem = document.getElementById(href[0])) {
-                                self.scrollToElement(elem, {
-                                    callback: function () {
-                                        window.location.href = '#' + elem.id
-                                    }
-                                });
-                            }
+                var target = e.target,
+                    hRef;
+
+                if (target.nodeName === 'A' && (hRef = target.getAttribute('href')).charAt(0) === '#'){
+                    e.preventDefault();
+
+                    if (hRef.length > 1){
+                        if (elem = document.getElementById(hRef.substring(1))) {
+                            self.scrollToElement(elem, {
+                                callback: function() {window.location.href = hRef;}
+                            });
                         }
+                    } else {
+                        self.scrollToElement(document.body, {
+                            callback: function() {window.location.href = '#';}
+                        });
                     }
                 }
             };
