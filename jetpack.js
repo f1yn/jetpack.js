@@ -24,13 +24,13 @@ var jetPack = function(options){
 
     var DEFAULT_DURATIONS = {
         slow: 2000,
-        default: 900,
+        medium: 900,
         fast: 400
-    }, globalDuration = DEFAULT_DURATIONS.default;
+    }, globalDuration = DEFAULT_DURATIONS.medium;
 
     /* global setters go here */
     self.setDuration = function(duration){
-        globalDuration = DEFAULT_DURATIONS.default;
+        globalDuration = DEFAULT_DURATIONS.medium;
 
         if (duration) {
             if (!isNaN(duration)) globalDuration = Number(duration);
@@ -42,12 +42,12 @@ var jetPack = function(options){
     self.setupdateURL = function(value){
         if (typeof value === 'boolean') updateURL = value;
         else console.warn('invalid parameter: "' + value + ' keeping default');
-    }
+    };
 
     self.setAnimate = function(value){
         if (typeof value === 'boolean') animationEnabled = value;
         else console.warn('invalid parameter: "' + value + ' keeping default');
-    }
+    };
 
 
     // scrolls to new position relative to the current scroll position of the root element (delta = change in Y axis)
@@ -76,17 +76,17 @@ var jetPack = function(options){
             };
             requestAnimationFrame(scrollFrame);
         } else root.scrollTop = scrollEndValue;
-    }
+    };
 
     // scrolls to specific Y axis location in relation to the root scroll location
     self.scrollTo = function (pos, args) {
         self.scroll(pos - root.scrollTop, args);
-    }
+    };
 
     // scrolls to element on page (pass element as first argument, second argument optional)
     self.scrollToElement = function (elem, args) {
         (typeof elem === "object") && elem && self.scroll(elem.getBoundingClientRect().top, args);
-    }
+    };
 
     self.hookAnchors =  function () {
         if (!self.hasListener){
@@ -114,20 +114,28 @@ var jetPack = function(options){
             document.body.addEventListener('click', listener);
             self.hasListener = true;
         }
+    };
+
+    self.setRoot = function(rootElement){
+        if (rootElement instanceof HTMLElement) root = rootElement;
+        else console.error('invalid root element');
     }
 
     self.setDuration(options.duration);
     self.setupdateURL(options.updateURL);
     self.setAnimate(options.animation);
 
-    var html = document.documentElement, body = document.body,
-        cacheTop = (typeof window.pageYOffset !== "undefined" ? window.pageYOffset : null) || body.scrollTop || html.scrollTop; // cache the window's current scroll position
+    document.addEventListener('DOMContentLoaded', function(){
+        setTimeout(function(){
+            var html = document.documentElement,
+                body = document.body;
 
-    // force change in scroll position to compare with cache.If scroll is not zero, it is safe to subtract.
-    html.scrollTop = body.scrollTop = cacheTop + (cacheTop > 0) ? -1 : 1;
-    // find root by checking which scrollTop has a value larger than the cache.
-    root = (html.scrollTop !== cacheTop) ? html : body;
+            var cacheTop = window.scrollY || html.scrollTop;
+            body.scrollTop = cacheTop + ((cacheTop > 0) ? -1 : 0);
+            root = (body.scrollTop !== cacheTop) ? document.body : html;
+            console.log(root);
 
-    root.scrollTop = cacheTop; // restore the window's scroll position to cached value
-    self.callback();
+            self.callback();
+        }, 1);
+    }, false);
 };
