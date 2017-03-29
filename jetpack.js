@@ -20,7 +20,7 @@ var jetPack = function(options){
         animationEnabled = true,
         root;
 
-    self.callback = (typeof options.callback === "function") ? options.callback : function () {};
+    self.callback = (typeof options.callback === "function") ? options.callback : null;
 
     var DEFAULT_DURATIONS = {
         slow: 2000,
@@ -133,9 +133,8 @@ var jetPack = function(options){
             var cacheTop = window.scrollY || html.scrollTop;
             body.scrollTop = cacheTop + ((cacheTop > 0) ? -1 : 0);
             root = (body.scrollTop !== cacheTop) ? document.body : html;
-            console.log(root);
 
-            self.callback();
+            self.callback && self.callback();
         }, 1);
     }, false);
 };
