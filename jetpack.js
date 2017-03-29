@@ -16,7 +16,7 @@ var jetPack = function(options){
     options = (typeof options === "object") ? options : {};
 
     var self = this,
-        URLupdate = true,
+        updateURL = true,
         animationEnabled = true,
         root;
 
@@ -39,8 +39,8 @@ var jetPack = function(options){
         }
     };
 
-    self.setURLupdate = function(value){
-        if (typeof value === 'boolean') URLupdate = value;
+    self.setupdateURL = function(value){
+        if (typeof value === 'boolean') updateURL = value;
         else console.warn('invalid parameter: "' + value + ' keeping default');
     }
 
@@ -100,12 +100,12 @@ var jetPack = function(options){
                     if (hRef.length > 1){
                         if (elem = document.getElementById(hRef.substring(1))) {
                             self.scrollToElement(elem, {
-                                callback: function() {URLupdate && (window.location.href = hRef)}
+                                callback: function() {updateURL && (window.location.href = hRef)}
                             });
                         }
                     } else {
                         self.scrollToElement(document.body, {
-                            callback: function() {URLupdate && (window.location.href = '#')}
+                            callback: function() {updateURL && (window.location.href = '#')}
                         });
                     }
                 }
@@ -117,7 +117,7 @@ var jetPack = function(options){
     }
 
     self.setDuration(options.duration);
-    self.setURLupdate(options.URLupdate);
+    self.setupdateURL(options.updateURL);
     self.setAnimate(options.animation);
 
     var html = document.documentElement, body = document.body,
@@ -129,5 +129,5 @@ var jetPack = function(options){
     root = (html.scrollTop !== cacheTop) ? html : body;
 
     root.scrollTop = cacheTop; // restore the window's scroll position to cached value
-
+    self.callback();
 };
