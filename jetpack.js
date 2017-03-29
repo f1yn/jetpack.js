@@ -12,35 +12,48 @@
  *
  * */
 
-var jetpack = {
-    duration: {
+var jetPack = function(options){
+    options = (typeof options === "object") ? options : {};
+
+    var self = this,
+        URLupdate = true,
+        animationEnabled = true,
+        root;
+
+    self.callback = (typeof options.callback === "function") ? options.callback : function () {};
+
+    var DEFAULT_DURATIONS = {
         slow: 2000,
         default: 900,
         fast: 400
-    },
-    hasListener: false, // default flag that prevents multiple document binds
+    }, globalDuration = DEFAULT_DURATIONS.default;
+
+    /* global setters go here */
+    self.setDuration = function(duration){
+        globalDuration = DEFAULT_DURATIONS.default;
+
+        if (duration) {
+            if (!isNaN(duration)) globalDuration = Number(duration);
+            else if (DEFAULT_DURATIONS.ifhasOwnProperty(optionDuration)) globalDuration = DEFAULT_DURATIONS[duration];
+            else console.warn('invalid parameter: "' + value + ' keeping default');
+        }
+    };
+
+    self.setURLupdate = function(value){
+        if (typeof value === 'boolean') URLupdate = value;
+        else console.warn('invalid parameter: "' + value + ' keeping default');
+    }
+
+    self.setAnimate = function(value){
+        if (typeof value === 'boolean') animationEnabled = value;
+        else console.warn('invalid parameter: "' + value + ' keeping default');
+    }
+
 
     // scrolls to new position relative to the current scroll position of the root element (delta = change in Y axis)
-    scroll: function (delta, args) {
-        var self = this,
-            root = self.root,
-            duration;
-
+    self.scroll = function(delta, args){
         args = (typeof args === "object") ? args : {};
-
         args.callback = (typeof args.callback === "function") ? args.callback : function () {};
-
-        switch (typeof (duration = args.duration)) {
-            case "undefined":
-                duration = self.duration.default;
-                break;
-            case "string":
-                duration = (typeof self.duration[duration] !== "undefined") ? self.duration[duration] : self.duration.default;
-                break;
-            default:
-                if (isNaN(duration)) duration = self.duration.default;
-                break;
-        }
 
         // animation formula (more to be added later)
         var easeInOutCubic = function (t, b, c, d) {
@@ -51,34 +64,32 @@ var jetpack = {
         var startTime = null,
             startPos = root.scrollTop,
             maxScroll = root.scrollHeight - window.innerHeight,
-            scrollEndValue = startPos + delta < maxScroll ? delta : maxScroll - startPos,
-            scrollFrame = function (timestamp) {
+            scrollEndValue = startPos + delta < maxScroll ? delta : maxScroll - startPos;
+
+        if (animationEnabled) {
+            var scrollFrame = function (timestamp) {
                 startTime = startTime || timestamp;
                 var elapsed = timestamp - startTime;
 
-                root.scrollTop = easeInOutCubic(elapsed, startPos, scrollEndValue, duration);
-                (elapsed < duration) ? requestAnimationFrame(scrollFrame) : args.callback();
+                root.scrollTop = easeInOutCubic(elapsed, startPos, scrollEndValue, globalDuration);
+                (elapsed < globalDuration) ? requestAnimationFrame(scrollFrame) : args.callback();
             };
-        requestAnimationFrame(scrollFrame);
-
-    },
+            requestAnimationFrame(scrollFrame);
+        } else root.scrollTop = scrollEndValue;
+    }
 
     // scrolls to specific Y axis location in relation to the root scroll location
-    scrollTo: function (pos, args) {
-        this.scroll(pos - this.root.scrollTop, args);
-    },
+    self.scrollTo = function (pos, args) {
+        self.scroll(pos - root.scrollTop, args);
+    }
 
     // scrolls to element on page (pass element as first argument, second argument optional)
-    scrollToElement: function (elem, args) {
-        (typeof elem === "object") && elem && this.scroll(elem.getBoundingClientRect().top, args);
-    },
+    self.scrollToElement = function (elem, args) {
+        (typeof elem === "object") && elem && self.scroll(elem.getBoundingClientRect().top, args);
+    }
 
-    // add event listener to body element to detect when an relevant anchor or url change occurs, and triggers a scrollToElement event
-    hookAnchors: function () {
-        var self = this;
-
+    self.hookAnchors =  function () {
         if (!self.hasListener){
-
             var listener = function (e) {
                 var target = e.target,
                     hRef;
@@ -89,12 +100,12 @@ var jetpack = {
                     if (hRef.length > 1){
                         if (elem = document.getElementById(hRef.substring(1))) {
                             self.scrollToElement(elem, {
-                                callback: function() {window.location.href = hRef;}
+                                callback: function() {URLupdate && (window.location.href = hRef)}
                             });
                         }
                     } else {
                         self.scrollToElement(document.body, {
-                            callback: function() {window.location.href = '#';}
+                            callback: function() {URLupdate && (window.location.href = '#')}
                         });
                     }
                 }
@@ -103,16 +114,20 @@ var jetpack = {
             document.body.addEventListener('click', listener);
             self.hasListener = true;
         }
-    }, setup: function () {
-        var html = document.documentElement, body = document.body,
-            cacheTop = (typeof window.pageYOffset !== "undefined" ? window.pageYOffset : null) || body.scrollTop || html.scrollTop; // cache the window's current scroll position
-
-        // force change in scroll position to compare with cache.If scroll is not zero, it is safe to subtract.
-        html.scrollTop = body.scrollTop = cacheTop + (cacheTop > 0) ? -1 : 1;
-        // find root by checking which scrollTop has a value larger than the cache.
-        this.root = html.scrollTop !== cacheTop ? html : body;
-
-        this.root.scrollTop = cacheTop; // restore the window's scroll position to cached value
     }
-};
 
+    self.setDuration(options.duration);
+    self.setURLupdate(options.URLupdate);
+    self.setAnimate(options.animation);
+
+    var html = document.documentElement, body = document.body,
+        cacheTop = (typeof window.pageYOffset !== "undefined" ? window.pageYOffset : null) || body.scrollTop || html.scrollTop; // cache the window's current scroll position
+
+    // force change in scroll position to compare with cache.If scroll is not zero, it is safe to subtract.
+    html.scrollTop = body.scrollTop = cacheTop + (cacheTop > 0) ? -1 : 1;
+    // find root by checking which scrollTop has a value larger than the cache.
+    root = (html.scrollTop !== cacheTop) ? html : body;
+
+    root.scrollTop = cacheTop; // restore the window's scroll position to cached value
+
+};
