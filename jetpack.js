@@ -35,18 +35,18 @@ var jetPack = function(options){
         if (duration) {
             if (!isNaN(duration)) globalDuration = Number(duration);
             else if (DEFAULT_DURATIONS.ifhasOwnProperty(optionDuration)) globalDuration = DEFAULT_DURATIONS[duration];
-            else console.warn('invalid parameter: "' + value + ' keeping default');
+            else console.warn('invalid parameter: "' + duration + '" keeping default');
         }
     };
 
     self.setupdateURL = function(value){
         if (typeof value === 'boolean') updateURL = value;
-        else console.warn('invalid parameter: "' + value + ' keeping default');
+        else console.warn('invalid parameter: "' + value + '" keeping default');
     };
 
     self.setAnimate = function(value){
         if (typeof value === 'boolean') animationEnabled = value;
-        else console.warn('invalid parameter: "' + value + ' keeping default');
+        else console.warn('invalid parameter: "' + value + '" keeping default');
     };
 
 
