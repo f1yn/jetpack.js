@@ -18,7 +18,7 @@ var jetPack = function(options){
     var self = this,
         updateURL = true,
         animationEnabled = true,
-        root;
+        html, body;
 
     self.callback = (typeof options.callback === "function") ? options.callback : null;
 
@@ -27,6 +27,14 @@ var jetPack = function(options){
         medium: 900,
         fast: 400
     }, globalDuration = DEFAULT_DURATIONS.medium;
+
+    var getDocumentHeight = function(){
+        return Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
+    }
+
+    var getScrollPosition = function() {return window.pageYOffset || html.scrollTop};
+
+    var getScrollHeight = function() {return body.scrollHeight || html.scrollHeight};
 
     /* global setters go here */
     self.setDuration = function(duration){
@@ -62,25 +70,27 @@ var jetPack = function(options){
         };
 
         var startTime = null,
-            startPos = root.scrollTop,
-            maxScroll = root.scrollHeight - window.innerHeight,
-            scrollEndValue = startPos + delta < maxScroll ? delta : maxScroll - startPos;
+            startPos = getScrollPosition(),
+            maxScroll = getScrollHeight() - window.innerHeight,
+            scrollEndValue = (startPos + delta < maxScroll) ? delta : maxScroll - startPos;
+
+        console.log([delta, maxScroll, startPos, scrollEndValue]);
 
         if (animationEnabled) {
             var scrollFrame = function (timestamp) {
                 startTime = startTime || timestamp;
                 var elapsed = timestamp - startTime;
 
-                root.scrollTop = easeInOutCubic(elapsed, startPos, scrollEndValue, globalDuration);
+                html.scrollTop = body.scrollTop = easeInOutCubic(elapsed, startPos, scrollEndValue, globalDuration);
                 (elapsed < globalDuration) ? requestAnimationFrame(scrollFrame) : args.callback();
             };
             requestAnimationFrame(scrollFrame);
-        } else root.scrollTop = scrollEndValue;
+        } else html.scrollTop = body.scrollTop = scrollEndValue;
     };
 
     // scrolls to specific Y axis location in relation to the root scroll location
     self.scrollTo = function (pos, args) {
-        self.scroll(pos - root.scrollTop, args);
+        self.scroll(pos - getScrollPosition(), args);
     };
 
     // scrolls to element on page (pass element as first argument, second argument optional)
@@ -116,25 +126,12 @@ var jetPack = function(options){
         }
     };
 
-    self.setRoot = function(rootElement){
-        if (rootElement instanceof HTMLElement) root = rootElement;
-        else console.error('invalid root element');
-    }
-
     self.setDuration(options.duration);
     self.setupdateURL(options.updateURL);
     self.setAnimate(options.animation);
 
     document.addEventListener('DOMContentLoaded', function(){
-        setTimeout(function(){
-            var html = document.documentElement,
-                body = document.body;
-
-            var cacheTop = window.scrollY || html.scrollTop;
-            body.scrollTop = cacheTop + ((cacheTop > 0) ? -1 : 0);
-            root = (body.scrollTop !== cacheTop) ? document.body : html;
-
-            self.callback && self.callback();
-        }, 1);
-    }, false);
+        html = document.documentElement;
+        body = document.body;
+    });
 };
