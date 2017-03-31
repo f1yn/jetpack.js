@@ -1,6 +1,8 @@
 
 # jetpack.js
 A simple vanilla JavaScript library that makes scrolling look outrageously good.
+A live demo of jetpack.js (alongside [automenu](https://github.com/flynnham/automenu)) can be found at [flynnbuckingham.com/projects/automenu-jetpack](http://flynnbuckingham.com/projects/automenu-jetpack).
+
 
 ## How to use
 Include either `jetpack.js` or `jetpack.min.js` to your document header, and simply add the following lines after your document has loaded:
