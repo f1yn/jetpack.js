@@ -74,8 +74,6 @@ var jetPack = function(options){
             maxScroll = getScrollHeight() - window.innerHeight,
             scrollEndValue = (startPos + delta < maxScroll) ? delta : maxScroll - startPos;
 
-        console.log([delta, maxScroll, startPos, scrollEndValue]);
-
         if (animationEnabled) {
             var scrollFrame = function (timestamp) {
                 startTime = startTime || timestamp;
