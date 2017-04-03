@@ -28,10 +28,6 @@ var jetPack = function(options){
         fast: 400
     }, globalDuration = DEFAULT_DURATIONS.medium;
 
-    var getDocumentHeight = function(){
-        return Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
-    }
-
     var getScrollPosition = function() {return window.pageYOffset || html.scrollTop};
 
     var getScrollHeight = function() {return body.scrollHeight || html.scrollHeight};
