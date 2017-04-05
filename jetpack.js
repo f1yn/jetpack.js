@@ -32,6 +32,8 @@ var jetPack = function(options){
 
     var getScrollHeight = function() {return body.scrollHeight || html.scrollHeight};
 
+    var hasListener = false;
+
     /* global setters go here */
     self.setDuration = function(duration){
         globalDuration = DEFAULT_DURATIONS.medium;
@@ -93,12 +95,13 @@ var jetPack = function(options){
     };
 
     self.hookAnchors =  function () {
-        if (!self.hasListener){
+        if (!hasListener){
             var listener = function (e) {
                 var target = e.target,
                     hRef;
 
                 if (target.nodeName === 'A' && (hRef = target.getAttribute('href')).charAt(0) === '#'){
+                    console.log(hRef);
                     e.preventDefault();
 
                     if (hRef.length > 1){
@@ -115,8 +118,8 @@ var jetPack = function(options){
                 }
             };
 
-            document.body.addEventListener('click', listener);
-            self.hasListener = true;
+            window.addEventListener('click', listener);
+            hasListener = true;
         }
     };
 
