@@ -17,8 +17,11 @@
   },
   "homepage": "https://github.com/flynnham/jetpack.js#readme",
   "dependencies": {
+    "flynn-fm": "git://github.com/flynnham/gulp-flynn-modulizer.git",
     "gulp": "^3.9.1",
+    "gulp-flynn-modulizer": "git://github.com/flynnham/gulp-flynn-modulizer.git",
     "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.6.1",
     "gulp-uglify": "^3.0.0"
   }
 }
