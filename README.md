@@ -22,3 +22,7 @@ Jetpack.js has the following options:
     animate: {boolean} || {default: true} // enabled or disables page animation.
 }
 ```
+
+## Building from source
+
+To build this project from source, install dependencies with `npm install` and run the builder with `gulp build`. If successful, build files will propulate the `dist/` directory.
