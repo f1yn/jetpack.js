@@ -15,12 +15,9 @@
 var jetPack = function(options){
     options = (typeof options === "object") ? options : {};
 
-    var self = this,
-        updateURL = true,
+    var updateURL = true,
         animationEnabled = true,
         html, body;
-
-    self.callback = (typeof options.callback === "function") ? options.callback : null;
 
     var DEFAULT_DURATIONS = {
         slow: 2000,
@@ -35,7 +32,8 @@ var jetPack = function(options){
     var hasListener = false;
 
     /* global setters go here */
-    self.setDuration = function(duration){
+
+    function setDuration(duration){
         globalDuration = DEFAULT_DURATIONS.medium;
 
         if (duration) {
@@ -45,19 +43,20 @@ var jetPack = function(options){
         }
     };
 
-    self.setupdateURL = function(value){
+    // toggle for whether the location href should update
+    function setupdateURL(value){
         if (typeof value === 'boolean') updateURL = value;
         else console.warn('invalid parameter: "' + value + '" keeping default');
     };
 
-    self.setAnimate = function(value){
+    // toggle for whether animations should be enabled or disabled
+    function setAnimate(value){
         if (typeof value === 'boolean') animationEnabled = value;
         else console.warn('invalid parameter: "' + value + '" keeping default');
     };
 
-
     // scrolls to new position relative to the current scroll position of the root element (delta = change in Y axis)
-    self.scroll = function(delta, args){
+    function scroll(delta, args){
         args = (typeof args === "object") ? args : {};
         args.callback = (typeof args.callback === "function") ? args.callback : function () {};
 
@@ -85,16 +84,17 @@ var jetPack = function(options){
     };
 
     // scrolls to specific Y axis location in relation to the root scroll location
-    self.scrollTo = function (pos, args) {
-        self.scroll(pos - getScrollPosition(), args);
+    function scrollTop(pos, args) {
+        scroll(pos - getScrollPosition(), args);
     };
 
     // scrolls to element on page (pass element as first argument, second argument optional)
-    self.scrollToElement = function (elem, args) {
-        (typeof elem === "object") && elem && self.scroll(elem.getBoundingClientRect().top, args);
+    function scrollToElement(elem, args) {
+        (typeof elem === "object") && elem && scroll(elem.getBoundingClientRect().top, args);
     };
 
-    self.hookAnchors =  function () {
+    // binds click event for anchors with hrefs on them (global event handler)
+    function hookAnchors() {
         if (!hasListener){
             var listener = function (e) {
                 var target = e.target,
@@ -106,12 +106,12 @@ var jetPack = function(options){
 
                     if (hRef.length > 1){
                         if (elem = document.getElementById(hRef.substring(1))) {
-                            self.scrollToElement(elem, {
+                            scrollToElement(elem, {
                                 callback: function() {updateURL && (window.location.href = hRef)}
                             });
                         }
                     } else {
-                        self.scrollToElement(document.body, {
+                        scrollToElement(document.body, {
                             callback: function() {updateURL && (window.location.href = '#')}
                         });
                     }
@@ -123,12 +123,20 @@ var jetPack = function(options){
         }
     };
 
-    self.setDuration(options.duration);
-    self.setupdateURL(options.updateURL);
-    self.setAnimate(options.animation);
+    setDuration(options.duration);
+    setupdateURL(options.updateURL);
+    setAnimate(options.animation);
 
-    //document.addEventListener('DOMContentLoaded', function(){
-        html = document.documentElement;
-        body = document.body;
-    //});
+    html = document.documentElement;
+    body = document.body;
+
+    return {
+        setDuration: setDuration,
+        setupdateURL: setupdateURL,
+        setAnimate: setAnimate,
+        scrollDelta: scroll,
+        scrollY: scrollTop,
+        scrollToElement: scrollToElement,
+        hookAnchors: hookAnchors
+    }
 };
