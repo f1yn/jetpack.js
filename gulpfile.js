@@ -29,10 +29,9 @@ gulp.task('build', ['clean', 'build-fm'], () => {
     var source = gulp.src(sourcePath);
 
     // normal (non-minified)
-    source.pipe(gulp.dest(paths.build));
-
-    // normal minified
-    return source.pipe(uglify())
+    source
+        .pipe(gulp.dest(paths.build))
+        .pipe(uglify())
         .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest(paths.build));
 });
