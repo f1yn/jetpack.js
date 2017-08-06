@@ -4,7 +4,7 @@ var path = require('path');
 var gulp = require('gulp');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
-var fmModule = require('../../../../gulp-flynn-modulizer/index.js');  //gulp-flynn-modulizer');
+var fmModule = require('gulp-flynn-modulizer');  //gulp-flynn-modulizer');
 
 const paths = {
     src: path.join(__dirname, './src'),

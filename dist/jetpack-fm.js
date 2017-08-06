@@ -100,13 +100,21 @@ function(options){
         if (!hasListener){
             var listener = function (e) {
                 var target = e.target,
-                    hRef;
+                    hRef = target.getAttribute('href');
 
-                if (target.nodeName === 'A' && (hRef = target.getAttribute('href')).charAt(0) === '#'){
+                __self__.log(target );
+
+                if (target.nodeName === 'A' && hRef.indexOf('#') < 2){
+
+                    // fix for pages with trailing '/'
+                    hRef = (hRef.indexOf('/#') === 0) ? hRef.substring(1) : hRef;
+
                     __self__.log(hRef);
                     e.preventDefault();
 
                     if (hRef.length > 1){
+
+
                         if (elem = document.getElementById(hRef.substring(1))) {
                             scrollToElement(elem, {
                                 callback: function() {updateURL && (window.location.href = hRef)}
