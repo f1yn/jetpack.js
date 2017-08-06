@@ -103,16 +103,12 @@ var jetPack = function(options){
                 console.log(target );
 
                 if (target.nodeName === 'A' && hRef.indexOf('#') < 2){
-
                     // fix for pages with trailing '/'
                     hRef = (hRef.indexOf('/#') === 0) ? hRef.substring(1) : hRef;
 
-                    console.log(hRef);
-                    e.preventDefault();
+                    if (hRef.charAt(0) === '#') e.preventDefault();
 
                     if (hRef.length > 1){
-
-
                         if (elem = document.getElementById(hRef.substring(1))) {
                             scrollToElement(elem, {
                                 callback: function() {updateURL && (window.location.href = hRef)}

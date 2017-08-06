@@ -106,7 +106,7 @@ var jetPack = function(options){
                     // fix for pages with trailing '/'
                     hRef = (hRef.indexOf('/#') === 0) ? hRef.substring(1) : hRef;
 
-                    e.preventDefault();
+                    if (hRef.charAt(0) === '#') e.preventDefault();
 
                     if (hRef.length > 1){
                         if (elem = document.getElementById(hRef.substring(1))) {
