@@ -14,7 +14,7 @@ const paths = {
 const sourcePath = path.join(paths.src, './jetpack.js');
 
 gulp.task('clean', () => {
-    return del(paths.build);
+    return del.sync(paths.build);
 });
 
 gulp.task('build-fm', ['clean'], ()=>{
