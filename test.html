@@ -39,8 +39,8 @@
     <script src="dist/jetpack.js"></script>
     <script>
         var ready = function(){
-            jetpack.setup();
-            jetpack.hookAnchors({live:true});
+            var jetpack = new jetPack();
+            jetpack.hookAnchors();
             document.body.removeChild(document.body.lastChild);
         };
     </script>
