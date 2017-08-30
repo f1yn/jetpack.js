@@ -4,6 +4,7 @@
   "description": "A simple vanilla JavaScript library that makes scrolling look outrageously good. A live demo of jetpack.js (alongside [automenu](https://github.com/flynnham/automenu)) can be found at [flynnbuckingham.com/projects/automenu-jetpack](http://flynnbuckingham.com/projects/automenu-jetpack).",
   "main": "jetpack.min.js",
   "scripts": {
+    "clean": "gulp clean",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/flynnham/jetpack.js#readme",
   "dependencies": {
+    "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-flynn-modulizer": "git://github.com/flynnham/gulp-flynn-modulizer.git",
     "gulp-rename": "^1.2.2",
