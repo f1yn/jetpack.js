@@ -4,8 +4,13 @@
   "description": "A simple vanilla JavaScript library that makes scrolling look outrageously good. A live demo of jetpack.js (alongside [automenu](https://github.com/flynnham/automenu)) can be found at [flynnbuckingham.com/projects/automenu-jetpack](http://flynnbuckingham.com/projects/automenu-jetpack).",
   "main": "jetpack.min.js",
   "scripts": {
-    "clean": "gulp clean",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf ./dist && mkdir ./dist",
+    "prebuild": "npm run clean",
+    "build:babel": "babel ./src --out-dir ./dist",
+    "build:uglify": "uglifyjs --compress --mangle -- ./dist/jetpack.js > ./dist/jetpack.min.js",
+    "build:wrap": "wrap-cli ./dist/jetpack.js 'jetpack' > ./dist/jetpack.wrap.js",
+    "build": "npm run build:fmwrap && npm run build:babel && npm run build:uglify",
+    "start": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -18,10 +23,13 @@
   },
   "homepage": "https://github.com/flynnham/jetpack.js#readme",
   "dependencies": {
-    "del": "^3.0.0",
-    "gulp": "^3.9.1",
-    "gulp-flynn-modulizer": "git://github.com/flynnham/gulp-flynn-modulizer.git",
-    "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^3.0.0"
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "rimraf": "^2.6.1",
+    "uglify-js": "^3.0.28",
+    "wrap-cli": "git://github.com/flynnham/wrap-cli.git"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1"
   }
 }
