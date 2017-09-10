@@ -9,7 +9,7 @@
     "build:babel": "babel ./src --out-dir ./dist",
     "build:uglify": "uglifyjs --compress --mangle -- ./dist/jetpack.js > ./dist/jetpack.min.js",
     "build:wrap": "wrap-cli ./dist/jetpack.js 'jetpack' > ./dist/jetpack.wrap.js",
-    "build": "npm run build:fmwrap && npm run build:babel && npm run build:uglify",
+    "build": "npm run build:wrap && npm run build:babel && npm run build:uglify",
     "start": "npm run build"
   },
   "repository": {
