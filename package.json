@@ -5,11 +5,11 @@
   "main": "jetpack.min.js",
   "scripts": {
     "clean": "rimraf ./dist && mkdir ./dist",
+    "build::babel": "babel --no-babelrc ./src/jetpack.js --presets=es2015-without-strict > ./dist/jetpack.js",
+    "build::uglify": "uglifyjs --compress --mangle -- ./dist/jetpack.js > ./dist/jetpack.min.js",
+    "build::wrap": "wrap-cli ./dist/jetpack.js 'jetpack' > ./dist/jetpack.wrap.js",
     "prebuild": "npm run clean",
-    "build:babel": "babel ./src --out-dir ./dist",
-    "build:uglify": "uglifyjs --compress --mangle -- ./dist/jetpack.js > ./dist/jetpack.min.js",
-    "build:wrap": "wrap-cli ./dist/jetpack.js 'jetpack' > ./dist/jetpack.wrap.js",
-    "build": "npm run build:wrap && npm run build:babel && npm run build:uglify",
+    "build": "npm run build::babel && parallelshell 'npm run build::uglify' 'npm run build::wrap'",
     "start": "npm run build"
   },
   "repository": {
@@ -22,14 +22,14 @@
     "url": "https://github.com/flynnham/jetpack.js/issues"
   },
   "homepage": "https://github.com/flynnham/jetpack.js#readme",
-  "dependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
-    "rimraf": "^2.6.1",
-    "uglify-js": "^3.0.28",
-    "wrap-cli": "git://github.com/flynnham/wrap-cli.git"
-  },
   "devDependencies": {
-    "assert": "^1.4.1"
+    "assert": "^1.4.1",
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015-without-strict": "0.0.4",
+    "parallelshell": "^3.0.1",
+    "rimraf": "^2.6.1",
+    "uglify-js": "^3.1.0",
+    "wrap-cli": "git://github.com/flynnham/wrap-cli.git",
+    "wrap-es5": "git://github.com/flynnham/wrap-es5.git"
   }
 }

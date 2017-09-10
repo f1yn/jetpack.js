@@ -36,26 +36,28 @@
 
         body > section span a {font-size: .5em}
     </style>
-    <script src="../dist/jetpack.js"></script>
-    <script>
-        var ready = function(){
-            var jetpack = new jetPack();
-            jetpack.hookAnchors();
-            document.body.removeChild(document.body.lastChild);
-        };
-    </script>
 </head>
 <body>
-    <div id="jetpack"></div>
-    <section><span>this is a jetpack<br><a href="#landing">(lets go down)</a></span></section>
-    <section><span>going faster</span></section>
-    <section><span>going even faster!</span></section>
-    <section><span>going much faster(er-ish)</span></section>
-    <section><span>WHOA!!!</span></section>
-    <section><span>SLOW DOWN!!!</span></section>
-    <section><span>coming in for a landing...</span></section>
-    <section><span>almost there...</span></section>
-    <section id="landing"><span>welcome back to Earth!<br><a href="#">(go back up)</a></span></section>
-    <script>ready();</script>
+<div id="jetpack"></div>
+<section><span>this is a jetpack<br><a href="#landing">(lets go down)</a></span></section>
+<section><span>going faster</span></section>
+<section><span>going even faster!</span></section>
+<section><span>going much faster(er-ish)</span></section>
+<section><span>WHOA!!!</span></section>
+<section><span>SLOW DOWN!!!</span></section>
+<section><span>coming in for a landing...</span></section>
+<section><span>almost there...</span></section>
+<section id="landing"><span>welcome back to Earth!<br><a href="#">(go back up)</a></span></section>
 </body>
+<script src="../node_modules/wrap-es5/module.js"></script>
+<script src="../dist/jetpack.wrap.js"></script>
+<script>
+    (window.__createModule('testing', function ($F) {
+        var jetpack = $F.require('jetpack');
+        var jp = jetpack();
+        jp.hookAnchors();
+
+        console.log(jp);
+    }));
+</script>
 </html>
