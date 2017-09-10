@@ -12,95 +12,105 @@
  *
  * */
 
-var jetPack = function(options){
-    options = (typeof options === "object") ? options : {};
+/*__START_WRAP__*/
+const jetpack = function(options = {}) {
 
-    var updateURL = true,
-        animationEnabled = true,
-        html, body;
-
-    var DEFAULT_DURATIONS = {
+    const presetDurations = {
         slow: 2000,
         medium: 900,
         fast: 400
-    }, globalDuration = DEFAULT_DURATIONS.medium;
-
-    var getScrollPosition = function() {return window.pageYOffset || html.scrollTop};
-
-    var getScrollHeight = function() {return body.scrollHeight || html.scrollHeight};
-
-    var hasListener = false;
-
-    /* global setters go here */
-
-    function setDuration(duration){
-        globalDuration = DEFAULT_DURATIONS.medium;
-
-        if (duration) {
-            if (!isNaN(duration)) globalDuration = Number(duration);
-            else if (DEFAULT_DURATIONS.ifhasOwnProperty(optionDuration)) globalDuration = DEFAULT_DURATIONS[duration];
-            else console.warn('invalid parameter: "' + duration + '" keeping default');
-        }
     };
 
-    // toggle for whether the location href should update
-    function setupdateURL(value){
-        if (typeof value === 'boolean') updateURL = value;
-        else console.warn('invalid parameter: "' + value + '" keeping default');
+    const config = {
+        duration: presetDurations.medium,
+        updateURL: false,
+        animation: true
     };
 
-    // toggle for whether animations should be enabled or disabled
-    function setAnimate(value){
-        if (typeof value === 'boolean') animationEnabled = value;
-        else console.warn('invalid parameter: "' + value + '" keeping default');
+    const flags = {
+        hasListener: false
     };
 
-    // scrolls to new position relative to the current scroll position of the root element (delta = change in Y axis)
-    function scroll(delta, args){
-        args = (typeof args === "object") ? args : {};
-        args.callback = (typeof args.callback === "function") ? args.callback : function () {};
+    const set = Object.freeze({
+        duration(value){
+            switch (typeof value){
+                case "number": {
+                    config.duration = Math.abs(value);
+                }
+                case "string": {
+                    let parsed = presetDurations[value] || value;
+                    if (!isNaN(parsed)){
+                        config.duration = Number(parsed);
+                    }
+                }
+                default: {
+                    // do nothing
+                }
+            }
+        },
+        updateURL: value => (config.updateURL = typeof value === "boolean" ? value : config.updateURL),
+        animation: value => (config.animation = typeof value === "boolean" ? value : config.animation)
+    });
 
-        // animation formula (more to be added later)
-        var easeInOutCubic = function (t, b, c, d) {
+    // start setting config based on options
+    set.duration(options.duration);
+    set.updateURL(options.updateURL);
+    set.animation(options.animation);
+
+    /* START METHODS */
+    const { documentElement, body } = document;
+
+    const getScrollPosition = () => (window.pageYOffset || documentElement.scrollTop);
+    const getScrollHeight = () => (body.scrollHeight || documentElement.scrollHeight);
+
+    // transition functions for scrolls (currently only one)
+    const ease = {
+        InOutCubic: (t, b, c, d) => {
             if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
             return c / 2 * ((t -= 2) * t * t + 2) + b;
-        };
+        }
+    }
 
-        var startTime = null,
+    const scroll = (delta = 0, args = {}) => {
+        args.callback = (typeof args.callback === "function") ? args.callback : () => {};
+
+        // animation formula (more to be added later)
+        let startTime = null,
             startPos = getScrollPosition(),
             maxScroll = getScrollHeight() - window.innerHeight,
             scrollEndValue = (startPos + delta < maxScroll) ? delta : maxScroll - startPos;
 
-        if (animationEnabled) {
-            var scrollFrame = function (timestamp) {
+        if (config.animation) {
+            const { InOutCubic } = ease;
+
+            const scrollFrame = timestamp => {
                 startTime = startTime || timestamp;
                 var elapsed = timestamp - startTime;
 
-                html.scrollTop = body.scrollTop = easeInOutCubic(elapsed, startPos, scrollEndValue, globalDuration);
-                (elapsed < globalDuration) ? requestAnimationFrame(scrollFrame) : args.callback();
+                documentElement.scrollTop = body.scrollTop = InOutCubic(elapsed, startPos, scrollEndValue, config.duration);
+                (elapsed < config.duration) ? requestAnimationFrame(scrollFrame) : args.callback();
             };
             requestAnimationFrame(scrollFrame);
-        } else html.scrollTop = body.scrollTop = scrollEndValue;
-    };
+
+        } else {
+            documentElement.scrollTop = body.scrollTop = scrollEndValue;
+        }
+    }
 
     // scrolls to specific Y axis location in relation to the root scroll location
-    function scrollTop(pos, args) {
+    const scrollTop = (pos = 0, args) =>
         scroll(pos - getScrollPosition(), args);
-    };
 
     // scrolls to element on page (pass element as first argument, second argument optional)
-    function scrollToElement(elem, args) {
-        (typeof elem === "object") && elem && scroll(elem.getBoundingClientRect().top, args);
-    };
+    const scrollToElement = (elem, args) =>
+        (typeof elem === "object" && elem !== null) &&
+            scroll(elem.getBoundingClientRect().top, args);
 
-    // binds click event for anchors with hrefs on them (global event handler)
-    function hookAnchors() {
-        if (!hasListener){
-            var listener = function (e) {
-                var target = e.target,
+    const hookAnchors = () => {
+        if (!flags.hasListener){
+            let listener = e => {
+                let target = e.target,
                     hRef = target.getAttribute('href');
-
-                console.log(target );
 
                 if (target.nodeName === 'A' && hRef.indexOf('#') < 2){
                     // fix for pages with trailing '/'
@@ -111,36 +121,29 @@ var jetPack = function(options){
                     if (hRef.length > 1){
                         if (elem = document.getElementById(hRef.substring(1))) {
                             scrollToElement(elem, {
-                                callback: function() {updateURL && (window.location.href = hRef)}
+                                callback: function() {config.updateURL && (window.location.href = hRef)}
                             });
                         }
                     } else {
-                        scrollToElement(document.body, {
-                            callback: function() {updateURL && (window.location.href = '#')}
+                        scrollToElement(body, {
+                            callback: function() {config.updateURL && (window.location.href = '#')}
                         });
                     }
                 }
             };
 
             window.addEventListener('click', listener);
-            hasListener = true;
+            flags.hasListener = true;
         }
-    };
-
-    setDuration(options.duration);
-    setupdateURL(options.updateURL);
-    setAnimate(options.animation);
-
-    html = document.documentElement;
-    body = document.body;
-
-    return {
-        setDuration: setDuration,
-        setupdateURL: setupdateURL,
-        setAnimate: setAnimate,
-        scrollDelta: scroll,
-        scrollY: scrollTop,
-        scrollToElement: scrollToElement,
-        hookAnchors: hookAnchors
     }
-};
+
+    return Object.freeze({
+        get: Object.freeze(config), // readonly
+        set, // also readonly, but setter
+        hookAnchors,
+        scrollToElement,
+        scroll,
+        scrollTop,
+    });
+}
+/*__END_WRAP__*/

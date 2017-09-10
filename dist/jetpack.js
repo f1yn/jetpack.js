@@ -1,3 +1,5 @@
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /*
  * jetpack (js)
  * A small javascript library that makes jumping to page locations look outrageously sexy.
@@ -12,97 +14,128 @@
  *
  * */
 
-var jetPack = function (options) {
-    options = typeof options === "object" ? options : {};
+/*__START_WRAP__*/
+var jetpack = function jetpack() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-    var updateURL = true,
-        animationEnabled = true,
-        html,
-        body;
 
-    var DEFAULT_DURATIONS = {
+    var presetDurations = {
         slow: 2000,
         medium: 900,
         fast: 400
-    },
-        globalDuration = DEFAULT_DURATIONS.medium;
-
-    var getScrollPosition = function () {
-        return window.pageYOffset || html.scrollTop;
     };
 
-    var getScrollHeight = function () {
-        return body.scrollHeight || html.scrollHeight;
+    var config = {
+        duration: presetDurations.medium,
+        updateURL: false,
+        animation: true
     };
 
-    var hasListener = false;
+    var flags = {
+        hasListener: false
+    };
 
-    /* global setters go here */
+    var set = Object.freeze({
+        duration: function duration(value) {
+            switch (typeof value === "undefined" ? "undefined" : _typeof(value)) {
+                case "number":
+                    {
+                        config.duration = Math.abs(value);
+                    }
+                case "string":
+                    {
+                        var parsed = presetDurations[value] || value;
+                        if (!isNaN(parsed)) {
+                            config.duration = Number(parsed);
+                        }
+                    }
+                default:
+                    {
+                        // do nothing
+                    }
+            }
+        },
 
-    function setDuration(duration) {
-        globalDuration = DEFAULT_DURATIONS.medium;
+        updateURL: function updateURL(value) {
+            return config.updateURL = typeof value === "boolean" ? value : config.updateURL;
+        },
+        animation: function animation(value) {
+            return config.animation = typeof value === "boolean" ? value : config.animation;
+        }
+    });
 
-        if (duration) {
-            if (!isNaN(duration)) globalDuration = Number(duration);else if (DEFAULT_DURATIONS.ifhasOwnProperty(optionDuration)) globalDuration = DEFAULT_DURATIONS[duration];else console.warn('invalid parameter: "' + duration + '" keeping default');
+    // start setting config based on options
+    set.duration(options.duration);
+    set.updateURL(options.updateURL);
+    set.animation(options.animation);
+
+    /* START METHODS */
+    var _document = document,
+        documentElement = _document.documentElement,
+        body = _document.body;
+
+
+    var getScrollPosition = function getScrollPosition() {
+        return window.pageYOffset || documentElement.scrollTop;
+    };
+    var getScrollHeight = function getScrollHeight() {
+        return body.scrollHeight || documentElement.scrollHeight;
+    };
+
+    // transition functions for scrolls (currently only one)
+    var ease = {
+        InOutCubic: function InOutCubic(t, b, c, d) {
+            if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
+            return c / 2 * ((t -= 2) * t * t + 2) + b;
         }
     };
 
-    // toggle for whether the location href should update
-    function setupdateURL(value) {
-        if (typeof value === 'boolean') updateURL = value;else console.warn('invalid parameter: "' + value + '" keeping default');
-    };
+    var scroll = function scroll() {
+        var delta = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    // toggle for whether animations should be enabled or disabled
-    function setAnimate(value) {
-        if (typeof value === 'boolean') animationEnabled = value;else console.warn('invalid parameter: "' + value + '" keeping default');
-    };
-
-    // scrolls to new position relative to the current scroll position of the root element (delta = change in Y axis)
-    function scroll(delta, args) {
-        args = typeof args === "object" ? args : {};
         args.callback = typeof args.callback === "function" ? args.callback : function () {};
 
         // animation formula (more to be added later)
-        var easeInOutCubic = function (t, b, c, d) {
-            if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
-            return c / 2 * ((t -= 2) * t * t + 2) + b;
-        };
-
         var startTime = null,
             startPos = getScrollPosition(),
             maxScroll = getScrollHeight() - window.innerHeight,
             scrollEndValue = startPos + delta < maxScroll ? delta : maxScroll - startPos;
 
-        if (animationEnabled) {
-            var scrollFrame = function (timestamp) {
+        if (config.animation) {
+            var InOutCubic = ease.InOutCubic;
+
+
+            var scrollFrame = function scrollFrame(timestamp) {
                 startTime = startTime || timestamp;
                 var elapsed = timestamp - startTime;
 
-                html.scrollTop = body.scrollTop = easeInOutCubic(elapsed, startPos, scrollEndValue, globalDuration);
-                elapsed < globalDuration ? requestAnimationFrame(scrollFrame) : args.callback();
+                documentElement.scrollTop = body.scrollTop = InOutCubic(elapsed, startPos, scrollEndValue, config.duration);
+                elapsed < config.duration ? requestAnimationFrame(scrollFrame) : args.callback();
             };
             requestAnimationFrame(scrollFrame);
-        } else html.scrollTop = body.scrollTop = scrollEndValue;
+        } else {
+            documentElement.scrollTop = body.scrollTop = scrollEndValue;
+        }
     };
 
     // scrolls to specific Y axis location in relation to the root scroll location
-    function scrollTop(pos, args) {
-        scroll(pos - getScrollPosition(), args);
+    var scrollTop = function scrollTop() {
+        var pos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var args = arguments[1];
+        return scroll(pos - getScrollPosition(), args);
     };
 
     // scrolls to element on page (pass element as first argument, second argument optional)
-    function scrollToElement(elem, args) {
-        typeof elem === "object" && elem && scroll(elem.getBoundingClientRect().top, args);
+    var scrollToElement = function scrollToElement(elem, args) {
+        return (typeof elem === "undefined" ? "undefined" : _typeof(elem)) === "object" && elem !== null && scroll(elem.getBoundingClientRect().top, args);
     };
 
-    // binds click event for anchors with hrefs on them (global event handler)
-    function hookAnchors() {
-        if (!hasListener) {
-            var listener = function (e) {
+    var hookAnchors = function hookAnchors() {
+        if (!flags.hasListener) {
+            var listener = function listener(e) {
                 var target = e.target,
                     hRef = target.getAttribute('href');
-
-                console.log(target);
 
                 if (target.nodeName === 'A' && hRef.indexOf('#') < 2) {
                     // fix for pages with trailing '/'
@@ -113,15 +146,15 @@ var jetPack = function (options) {
                     if (hRef.length > 1) {
                         if (elem = document.getElementById(hRef.substring(1))) {
                             scrollToElement(elem, {
-                                callback: function () {
-                                    updateURL && (window.location.href = hRef);
+                                callback: function callback() {
+                                    config.updateURL && (window.location.href = hRef);
                                 }
                             });
                         }
                     } else {
-                        scrollToElement(document.body, {
-                            callback: function () {
-                                updateURL && (window.location.href = '#');
+                        scrollToElement(body, {
+                            callback: function callback() {
+                                config.updateURL && (window.location.href = '#');
                             }
                         });
                     }
@@ -129,24 +162,18 @@ var jetPack = function (options) {
             };
 
             window.addEventListener('click', listener);
-            hasListener = true;
+            flags.hasListener = true;
         }
     };
 
-    setDuration(options.duration);
-    setupdateURL(options.updateURL);
-    setAnimate(options.animation);
-
-    html = document.documentElement;
-    body = document.body;
-
-    return {
-        setDuration: setDuration,
-        setupdateURL: setupdateURL,
-        setAnimate: setAnimate,
-        scrollDelta: scroll,
-        scrollY: scrollTop,
+    return Object.freeze({
+        get: Object.freeze(config), // readonly
+        set: set, // also readonly, but setter
+        hookAnchors: hookAnchors,
         scrollToElement: scrollToElement,
-        hookAnchors: hookAnchors
-    };
+        scroll: scroll,
+        scrollTop: scrollTop
+    });
 };
+/*__END_WRAP__*/
+

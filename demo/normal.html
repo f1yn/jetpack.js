@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="UTF-8">
+    <title>jetpack testing area</title>
+    <style>
+        * {margin: 0; padding: 0; box-sizing: border-box}
+
+        body, html {width: 100%; height: 100%}
+
+        body{
+            font-size: 15px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #222;
+        }
+
+        body > section {
+            position: relative;
+            height: 100%;
+            line-height: 1;
+            font-size: 3em;
+            text-align: center;
+        }
+
+        body > section:nth-child(2n) {background-color: #eee; background-color: rgba(0,0,0, .1)}
+
+        body > section span{
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            margin-top: -.5em;
+        }
+
+        body > section span a {font-size: .5em}
+    </style>
+    <script src="../dist/jetpack.js"></script>
+    <script>
+        var ready = function(){
+            var jp = new jetpack();
+            jp.hookAnchors();
+            document.body.removeChild(document.body.lastChild);
+        };
+    </script>
+</head>
+<body>
+    <div id="jetpack"></div>
+    <section><span>this is a jetpack<br><a href="#landing">(lets go down)</a></span></section>
+    <section><span>going faster</span></section>
+    <section><span>going even faster!</span></section>
+    <section><span>going much faster(er-ish)</span></section>
+    <section><span>WHOA!!!</span></section>
+    <section><span>SLOW DOWN!!!</span></section>
+    <section><span>coming in for a landing...</span></section>
+    <section><span>almost there...</span></section>
+    <section id="landing"><span>welcome back to Earth!<br><a href="#">(go back up)</a></span></section>
+    <script>ready();</script>
+</body>
+</html>
