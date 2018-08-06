@@ -27,4 +27,5 @@ options = {
 
 ## Building from source
 To build this project from source, install dependencies with `npm install` and run the builder with `gulp build`.
-If successful, build files will populate the `dist/` directory.
+If successful, build files will populate the `dist/` directory. This module works best as being required in a bundling
+software.

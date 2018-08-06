@@ -2,7 +2,7 @@
   "name": "jetpack",
   "version": "1.0.0",
   "description": "A simple vanilla JavaScript library that makes scrolling look outrageously good. A live demo of jetpack.js (alongside [automenu](https://github.com/flynnham/automenu)) can be found at [flynnbuckingham.com/projects/automenu-jetpack](http://flynnbuckingham.com/projects/automenu-jetpack).",
-  "main": "jetpack.min.js",
+  "main": "src/jetpack.js",
   "scripts": {
     "clean": "rimraf ./dist && mkdir ./dist",
     "build::babel": "babel --no-babelrc ./src/jetpack.js --presets=es2015-without-strict > ./dist/jetpack.js",
